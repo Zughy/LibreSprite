@@ -23,7 +23,10 @@ jobs:
           cd ..
           ls
       - name: create tar.gz
-        run: tar -czf SOURCE\ CODE\ +\ submodules.tar.gz *
+        run: |
+          git archive -o SOURCE\ CODE\ +\ submodules.tar HEAD
+          git submodule --quiet foreach 'cd $toplevel; tar -uf SOURCE\ CODE\ +\ submodules.tar $sm_path'
+          gzip -9 SOURCE\ CODE\ +\ submodules.zip HEAD.tar
       - name: create zip
         run: |
           git archive -o SOURCE\ CODE\ +\ submodules.zip HEAD
