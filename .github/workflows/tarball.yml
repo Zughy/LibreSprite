@@ -18,5 +18,11 @@ jobs:
 
       - name: checkout modules
         run: git submodule update --init --recursive
+      - name: create zip
+        run: |
+          git archive -o REAL_SOURCE_CODE.zip master
+          git submodule --quiet foreach 'cd $toplevel; zip -ru REAL_SOURCE_CODE.zip $sm_path'
       - name: release
         uses: softprops/action-gh-release@v1
+        with:
+          files: REAL_SOURCE_CODE.zip
