@@ -19,7 +19,7 @@ jobs:
       - name: checkout modules
         run: git submodule update --init --recursive
       - name: create tar.gz
-        run: tar -czf SOURCE\ CODE\ +\ submodules.tar.gz *
+        run: tar -czf SOURCE\ CODE\ +\ submodules.tar.gz * .*
       - name: create zip
         run: |
           git archive -o SOURCE\ CODE\ +\ submodules.zip HEAD
