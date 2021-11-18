@@ -18,11 +18,15 @@ jobs:
 
       - name: checkout modules
         run: git submodule update --init --recursive
+      - name: create tar.gz
+        run: tar -czf SOURCE\ CODE\ +\ submodules.tar.gz *
       - name: create zip
         run: |
-          git archive -o REAL_SOURCE_CODE.zip HEAD
-          git submodule --quiet foreach 'cd $toplevel; zip -ru REAL_SOURCE_CODE.zip $sm_path'
+          git archive -o SOURCE\ CODE\ +\ submodules.zip HEAD
+          git submodule --quiet foreach 'cd $toplevel; zip -ru SOURCE\ CODE\ +\ submodules.zip $sm_path'
       - name: release
         uses: softprops/action-gh-release@v1
         with:
-          files: REAL_SOURCE_CODE.zip
+          files: |
+            SOURCE\ CODE\ +\ submodules.tar.gz
+            SOURCE\ CODE\ +\ submodules.zip
