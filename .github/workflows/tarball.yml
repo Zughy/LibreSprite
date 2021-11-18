@@ -1,0 +1,22 @@
+name: Full tarball
+
+on:
+  push:
+    tags:
+      - '*'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: checkout modules
+        run: git submodule update --init --recursive
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
