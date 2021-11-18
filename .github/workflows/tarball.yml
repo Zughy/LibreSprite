@@ -24,9 +24,9 @@ jobs:
           ls
       - name: create tar.gz
         run: |
-          git archive -o SOURCE\ CODE\ +\ submodules.tar HEAD
-          git submodule --quiet foreach 'cd $toplevel; tar -uf SOURCE\ CODE\ +\ submodules.tar $sm_path'
-          gzip -9 SOURCE\ CODE\ +\ submodules.tar
+          git archive -o SOURCE.CODE.+.submodules.tar HEAD
+          git submodule --quiet foreach 'cd $toplevel; tar -uf SOURCE.CODE.+.submodules.tar $sm_path'
+          gzip -9 SOURCE.CODE.+.submodules.tar
       - name: create zip
         run: |
           git archive -o SOURCE\ CODE\ +\ submodules.zip HEAD
