@@ -20,7 +20,7 @@ jobs:
         run: git submodule update --init --recursive
       - name: create zip
         run: |
-          git archive -o REAL_SOURCE_CODE.zip master
+          git archive -o REAL_SOURCE_CODE.zip HEAD
           git submodule --quiet foreach 'cd $toplevel; zip -ru REAL_SOURCE_CODE.zip $sm_path'
       - name: release
         uses: softprops/action-gh-release@v1
