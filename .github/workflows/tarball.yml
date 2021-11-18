@@ -35,5 +35,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            SOURCE\ CODE\ +\ submodules.tar.gz
+            SOURCE.CODE.+.submodules.tar.gz
             SOURCE\ CODE\ +\ submodules.zip
