@@ -6,13 +6,15 @@
 
 #pragma once
 
+#include <memory>
+
 namespace doc {
 
   class Palette;
 
   namespace file {
 
-    Palette* load_col_file(const char* filename);
+    std::shared_ptr<Palette> load_col_file(const char* filename);
     bool save_col_file(const Palette* pal, const char* filename);
 
   } // namespace file

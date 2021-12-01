@@ -26,15 +26,15 @@ namespace file {
 using namespace base;
 
 // Loads a COL file (Animator and Animator Pro format)
-Palette* load_col_file(const char* filename)
+std::shared_ptr<Palette> load_col_file(const char* filename)
 {
-  Palette *pal = NULL;
+  std::shared_ptr<Palette> pal = nullptr;
   int c, r, g, b;
   FILE* f;
 
   f = std::fopen(filename, "rb");
   if (!f)
-    return NULL;
+    return nullptr;
 
   // Get file size.
   std::fseek(f, 0, SEEK_END);
@@ -45,12 +45,12 @@ Palette* load_col_file(const char* filename)
   bool pro = (size == 768)? false: true; // is Animator Pro format?
   if (!(size) || (pro && d.rem)) {       // Invalid format
     fclose(f);
-    return NULL;
+    return nullptr;
   }
 
   // Animator format
   if (!pro) {
-    pal = new Palette(frame_t(0), 256);
+    pal = std::make_shared<Palette>(frame_t(0), 256);
 
     for (c=0; c<256; c++) {
       r = fgetc(f);
@@ -75,10 +75,10 @@ Palette* load_col_file(const char* filename)
     // Unknown format
     if (magic != PROCOL_MAGIC_NUMBER || version != 0) {
       fclose(f);
-      return NULL;
+      return nullptr;
     }
 
-    pal = new Palette(frame_t(0), MIN(d.quot, 256));
+    pal = std::make_shared<Palette>(frame_t(0), MIN(d.quot, 256));
 
     for (c=0; c<pal->size(); c++) {
       r = fgetc(f);

@@ -23,7 +23,7 @@
 namespace doc {
 namespace file {
 
-Palette* load_pal_file(const char *filename)
+std::shared_ptr<Palette> load_pal_file(const char *filename)
 {
   std::ifstream f(FSTREAM_PATH(filename));
   if (f.bad())
@@ -48,7 +48,7 @@ Palette* load_pal_file(const char *filename)
   if (!std::getline(f, line))
     return nullptr;
 
-  std::unique_ptr<Palette> pal(new Palette(frame_t(0), 0));
+  std::shared_ptr<Palette> pal = std::make_shared<Palette>(frame_t(0), 0);
 
   while (std::getline(f, line)) {
     // Trim line
@@ -64,7 +64,7 @@ Palette* load_pal_file(const char *filename)
     pal->addEntry(rgba(r, g, b, 255));
   }
 
-  return pal.release();
+  return pal;
 }
 
 bool save_pal_file(const Palette *pal, const char *filename)

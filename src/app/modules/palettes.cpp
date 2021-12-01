@@ -25,10 +25,10 @@
 namespace app {
 
 // The default color palette.
-static Palette* ase_default_palette = NULL;
+static Palette* ase_default_palette = nullptr;
 
 // Palette in current sprite frame.
-static Palette* ase_current_palette = NULL;
+static Palette* ase_current_palette = nullptr;
 
 int init_module_palette()
 {
@@ -45,12 +45,12 @@ void exit_module_palette()
 
 void load_default_palette(const std::string& userDefined)
 {
-  std::unique_ptr<Palette> pal;
+  std::shared_ptr<Palette> pal;
 
   // Load specific palette file defined by the user in the command line.
   std::string palFile = userDefined;
   if (!palFile.empty())
-    pal.reset(load_palette(palFile.c_str()));
+    pal = load_palette(palFile.c_str());
   // Load default palette file
   else {
     std::string defaultPalName = get_preset_palette_filename(
@@ -59,7 +59,7 @@ void load_default_palette(const std::string& userDefined)
     // If there is no palette in command line, we use the default one.
     palFile = defaultPalName;
     if (base::is_file(palFile)) {
-      pal.reset(load_palette(palFile.c_str()));
+      pal = load_palette(palFile.c_str());
     }
     else {
       // Migrate old default.gpl to default.ase format
@@ -67,7 +67,7 @@ void load_default_palette(const std::string& userDefined)
         get_default_palette_preset_name(), ".gpl");
 
       if (base::is_file(palFile)) {
-        pal.reset(load_palette(palFile.c_str()));
+        pal = load_palette(palFile.c_str());
 
         // Remove duplicate black entries at the end (as old palettes
         // contains 256 colors)
@@ -110,7 +110,7 @@ void load_default_palette(const std::string& userDefined)
         ResourceFinder rf;
         rf.includeDataDir("palettes/db32.gpl");
         if (rf.findFirst()) {
-          pal.reset(load_palette(rf.filename().c_str()));
+          pal = load_palette(rf.filename().c_str());
         }
       }
 

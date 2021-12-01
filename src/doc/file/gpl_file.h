@@ -6,13 +6,15 @@
 
 #pragma once
 
+#include <memory>
+
 namespace doc {
 
   class Palette;
 
   namespace file {
 
-    Palette* load_gpl_file(const char* filename);
+    std::shared_ptr<Palette> load_gpl_file(const char* filename);
     bool save_gpl_file(const Palette* pal, const char* filename);
 
   } // namespace file

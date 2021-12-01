@@ -46,10 +46,10 @@ std::string get_writable_palette_extensions()
   return buf;
 }
 
-Palette* load_palette(const char *filename)
+std::shared_ptr<Palette> load_palette(const char *filename)
 {
   std::string ext = base::string_to_lower(base::get_file_extension(filename));
-  Palette* pal = NULL;
+  std::shared_ptr<Palette> pal = nullptr;
 
   if (ext == "col") {
     pal = doc::file::load_col_file(filename);
@@ -76,8 +76,7 @@ Palette* load_palette(const char *filename)
         if (fop->document() &&
             fop->document()->sprite() &&
             fop->document()->sprite()->palette(frame_t(0))) {
-          pal = new Palette(
-            *fop->document()->sprite()->palette(frame_t(0)));
+          pal = std::make_shared<Palette>(*fop->document()->sprite()->palette(frame_t(0)));
         }
 
         delete fop->releaseDocument();
