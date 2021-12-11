@@ -51,10 +51,6 @@ Palette::Palette(const Palette& palette, const Remap& remap)
   m_modifications = 0;
 }
 
-Palette::~Palette()
-{
-}
-
 Palette* Palette::createGrayscale()
 {
   Palette* graypal = new Palette(frame_t(0), 256);

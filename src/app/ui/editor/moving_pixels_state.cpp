@@ -497,7 +497,7 @@ void MovingPixelsState::onBeforeCommandExecution(CommandExecutionEvent& ev)
 
       clipboard::copy_image(floatingImage.get(),
                             floatingMask.get(),
-                            document->sprite()->palette(m_editor->frame()));
+                            document->sprite()->palette(m_editor->frame()).get());
     }
 
     // Clear floating pixels on Cut/Clear.

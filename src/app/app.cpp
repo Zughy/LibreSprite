@@ -124,7 +124,7 @@ public:
 
 };
 
-App* App::m_instance = NULL;
+App* App::m_instance = nullptr;
 
 App::App()
   : m_coreModules(nullptr)
@@ -134,7 +134,7 @@ App::App()
   , m_isShell(false)
   , m_exporter(nullptr)
 {
-  ASSERT(m_instance == NULL);
+  ASSERT(m_instance == nullptr);
   m_instance = this;
 }
 
@@ -834,10 +834,10 @@ void app_refresh_screen()
 
   Site site = context->activeSite();
 
-  if (Palette* pal = site.palette())
+  if (std::shared_ptr<Palette> pal = site.palette())
     set_current_palette(pal, false);
   else
-    set_current_palette(NULL, false);
+    set_current_palette(nullptr, false);
 
   // Invalidate the whole screen.
   ui::Manager::getDefault()->invalidate();

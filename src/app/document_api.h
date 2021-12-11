@@ -15,6 +15,8 @@
 #include "doc/pixel_format.h"
 #include "gfx/rect.h"
 
+#include <memory>
+
 namespace doc {
   class Cel;
   class Image;
@@ -102,7 +104,7 @@ namespace app {
     void setMaskPosition(int x, int y);
 
     // Palette API
-    void setPalette(Sprite* sprite, frame_t frame, const Palette* newPalette);
+    void setPalette(Sprite* sprite, frame_t frame, std::shared_ptr<Palette> newPalette);
 
   private:
     void setCelFramePosition(Cel* cel, frame_t frame);

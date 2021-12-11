@@ -20,18 +20,18 @@ namespace cmd {
 
 using namespace doc;
 
-SetPalette::SetPalette(Sprite* sprite, frame_t frame, const Palette* newPalette)
+SetPalette::SetPalette(Sprite* sprite, frame_t frame, std::shared_ptr<Palette> newPalette)
   : WithSprite(sprite)
   , m_frame(frame)
 {
-  const Palette* curPalette = sprite->palette(frame);
+  std::shared_ptr<Palette> curPalette = std::make_shared<Palette>(*sprite->palette(frame));
 
   m_oldNColors = curPalette->size();
   m_newNColors = newPalette->size();
 
   // Check differences between current sprite palette and the new one
   m_from = m_to = -1;
-  int diffs = curPalette->countDiff(newPalette, &m_from, &m_to);
+  int diffs = curPalette->countDiff(newPalette.get(), &m_from, &m_to);
   (void)diffs;
   ASSERT(diffs > 0);
 
@@ -57,7 +57,7 @@ SetPalette::SetPalette(Sprite* sprite, frame_t frame, const Palette* newPalette)
 void SetPalette::onExecute()
 {
   Sprite* sprite = this->sprite();
-  Palette* palette = sprite->palette(m_frame);
+  Palette* palette = sprite->palette(m_frame).get();
   palette->resize(m_newNColors);
 
   for (size_t i=0; i<m_newColors.size(); ++i)
@@ -69,7 +69,7 @@ void SetPalette::onExecute()
 void SetPalette::onUndo()
 {
   Sprite* sprite = this->sprite();
-  Palette* palette = sprite->palette(m_frame);
+  Palette* palette = sprite->palette(m_frame).get();
   palette->resize(m_oldNColors);
 
   for (size_t i=0; i<m_oldColors.size(); ++i)

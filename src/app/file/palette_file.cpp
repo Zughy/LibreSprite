@@ -91,19 +91,19 @@ std::shared_ptr<Palette> load_palette(const char *filename)
   return pal;
 }
 
-bool save_palette(const char *filename, const Palette* pal, int columns)
+bool save_palette(const char *filename, std::shared_ptr<Palette> pal, int columns)
 {
   std::string ext = base::string_to_lower(base::get_file_extension(filename));
   bool success = false;
 
   if (ext == "col") {
-    success = doc::file::save_col_file(pal, filename);
+    success = doc::file::save_col_file(pal.get(), filename);
   }
   else if (ext == "gpl") {
-    success = doc::file::save_gpl_file(pal, filename);
+    success = doc::file::save_gpl_file(pal.get(), filename);
   }
   else if (ext == "pal") {
-    success = doc::file::save_pal_file(pal, filename);
+    success = doc::file::save_pal_file(pal.get(), filename);
   }
   else {
     FileFormat* ff = FileFormatsManager::instance()->getFileFormatByExtension(ext.c_str());

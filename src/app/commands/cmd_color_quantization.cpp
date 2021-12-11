@@ -99,7 +99,7 @@ void ColorQuantizationCommand::onExecute(Context* context)
       Site site = context->activeSite();
       sprite = site.sprite();
       frame = site.frame();
-      curPalette = sprite->palette(frame);
+      curPalette = sprite->palette(frame).get();
 
       window.newPalette()->setSelected(true);
       window.alphaChannel()->setSelected(
@@ -150,9 +150,8 @@ void ColorQuantizationCommand::onExecute(Context* context)
     if (job.isCanceled())
       return;
 
-    std::unique_ptr<Palette> newPalette(
-      new Palette(createPal ? tmpPalette:
-                              *get_current_palette()));
+    std::shared_ptr<Palette> newPalette = std::make_unique<Palette>(
+      createPal ? tmpPalette: *get_current_palette());
 
     if (createPal) {
       entries = PalettePicks(newPalette->size());
@@ -169,10 +168,10 @@ void ColorQuantizationCommand::onExecute(Context* context)
     if (*curPalette != *newPalette) {
       ContextWriter writer(UIContext::instance(), 500);
       Transaction transaction(writer.context(), "Color Quantization", ModifyDocument);
-      transaction.execute(new cmd::SetPalette(sprite, frame, newPalette.get()));
+      transaction.execute(new cmd::SetPalette(sprite, frame, newPalette));
       transaction.commit();
 
-      set_current_palette(newPalette.get(), false);
+      set_current_palette(newPalette, false);
       ui::Manager::getDefault()->invalidate();
     }
   }

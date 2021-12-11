@@ -48,7 +48,7 @@ SetPixelFormat::SetPixelFormat(Sprite* sprite,
       render::convert_pixel_format
       (old_image.get(), NULL, newFormat, m_dithering,
        sprite->rgbMap(cel->frame()),
-       sprite->palette(cel->frame()),
+       sprite->palette(cel->frame()).get(),
        cel->layer()->isBackground(),
        old_image->maskColor()));
 
@@ -70,12 +70,12 @@ SetPixelFormat::SetPixelFormat(Sprite* sprite,
   if (newFormat == IMAGE_GRAYSCALE) {
     // Add cmds to revert all palette changes.
     PalettesList palettes = sprite->getPalettes();
-    for (Palette* pal : palettes)
+    for (std::shared_ptr<Palette> pal : palettes)
       if (pal->frame() != 0)
         m_seq.add(new cmd::RemovePalette(sprite, pal));
 
-    std::unique_ptr<Palette> graypal(Palette::createGrayscale());
-    m_seq.add(new cmd::SetPalette(sprite, 0, graypal.get()));
+    std::shared_ptr<Palette> graypal(Palette::createGrayscale());
+    m_seq.add(new cmd::SetPalette(sprite, 0, graypal));
   }
 }
 

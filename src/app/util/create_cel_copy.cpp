@@ -29,18 +29,17 @@ Cel* create_cel_copy(const Cel* srcCel,
 {
   const Image* celImage = srcCel->image();
 
-  std::unique_ptr<Cel> dstCel(
-    new Cel(dstFrame,
-            std::shared_ptr<Image>(Image::create(dstSprite->pixelFormat(),
-                                   celImage->width(),
-                                   celImage->height()))));
+  std::unique_ptr<Cel> dstCel = std::make_unique<Cel>(
+    dstFrame, std::shared_ptr<Image>(Image::create(dstSprite->pixelFormat(),
+                                      celImage->width(),
+                                      celImage->height())));
 
   // If both images are indexed but with different palette, we can
   // convert the source cel to RGB first.
   if (dstSprite->pixelFormat() == IMAGE_INDEXED &&
       celImage->pixelFormat() == IMAGE_INDEXED &&
       srcCel->sprite()->palette(srcCel->frame())->countDiff(
-        dstSprite->palette(dstFrame), nullptr, nullptr)) {
+        dstSprite->palette(dstFrame).get(), nullptr, nullptr)) {
     std::shared_ptr<Image> tmpImage(Image::create(IMAGE_RGB, celImage->width(), celImage->height()));
     tmpImage->clear(0);
 
@@ -50,7 +49,7 @@ Cel* create_cel_copy(const Cel* srcCel,
       IMAGE_RGB,
       DitheringMethod::NONE,
       srcCel->sprite()->rgbMap(srcCel->frame()),
-      srcCel->sprite()->palette(srcCel->frame()),
+      srcCel->sprite()->palette(srcCel->frame()).get(),
       srcCel->layer()->isBackground(),
       0);
 
@@ -60,7 +59,7 @@ Cel* create_cel_copy(const Cel* srcCel,
       IMAGE_INDEXED,
       DitheringMethod::NONE,
       dstSprite->rgbMap(dstFrame),
-      dstSprite->palette(dstFrame),
+      dstSprite->palette(dstFrame).get(),
       srcCel->layer()->isBackground(),
       dstSprite->transparentColor());
   }
@@ -68,7 +67,7 @@ Cel* create_cel_copy(const Cel* srcCel,
     render::composite_image(
       dstCel->image(),
       celImage,
-      srcCel->sprite()->palette(srcCel->frame()),
+      srcCel->sprite()->palette(srcCel->frame()).get(),
       0, 0, 255, BlendMode::SRC);
   }
 

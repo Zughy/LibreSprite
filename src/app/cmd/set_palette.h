@@ -12,6 +12,7 @@
 #include "doc/color.h"
 #include "doc/frame.h"
 
+#include <memory>
 #include <vector>
 
 namespace doc {
@@ -26,7 +27,7 @@ namespace cmd {
   class SetPalette : public Cmd
                    , public WithSprite {
   public:
-    SetPalette(Sprite* sprite, frame_t frame, const Palette* newPalette);
+    SetPalette(Sprite* sprite, frame_t frame, std::shared_ptr<Palette> newPalette);
 
   protected:
     void onExecute() override;

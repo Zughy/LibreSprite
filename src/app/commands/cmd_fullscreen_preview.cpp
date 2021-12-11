@@ -208,28 +208,28 @@ protected:
 
     switch (m_tiled) {
       case TiledMode::NONE:
-        render.renderImage(m_doublebuf.get(), m_render.get(), m_pal, x, y,
+        render.renderImage(m_doublebuf.get(), m_render.get(), m_pal.get(), x, y,
                            m_zoom, 255, BlendMode::NORMAL);
         break;
       case TiledMode::X_AXIS:
         for (u=x-w; u<ui::display_w()+w; u+=w)
-          render.renderImage(m_doublebuf.get(), m_render.get(), m_pal, u, y,
+          render.renderImage(m_doublebuf.get(), m_render.get(), m_pal.get(), u, y,
                              m_zoom, 255, BlendMode::NORMAL);
         break;
       case TiledMode::Y_AXIS:
         for (v=y-h; v<ui::display_h()+h; v+=h)
-          render.renderImage(m_doublebuf.get(), m_render.get(), m_pal, x, v,
+          render.renderImage(m_doublebuf.get(), m_render.get(), m_pal.get(), x, v,
                              m_zoom, 255, BlendMode::NORMAL);
         break;
       case TiledMode::BOTH:
         for (v=y-h; v<ui::display_h()+h; v+=h)
           for (u=x-w; u<ui::display_w()+w; u+=w)
-            render.renderImage(m_doublebuf.get(), m_render.get(), m_pal, u, v,
+            render.renderImage(m_doublebuf.get(), m_render.get(), m_pal.get(), u, v,
                                m_zoom, 255, BlendMode::NORMAL);
         break;
     }
 
-    doc::convert_image_to_surface(m_doublebuf.get(), m_pal,
+    doc::convert_image_to_surface(m_doublebuf.get(), m_pal.get(),
       m_doublesur, 0, 0, 0, 0, m_doublebuf->width(), m_doublebuf->height());
     g->blit(m_doublesur, 0, 0, 0, 0, m_doublesur->width(), m_doublesur->height());
   }
@@ -239,7 +239,7 @@ private:
   Editor* m_editor;
   Document* m_doc;
   Sprite* m_sprite;
-  const Palette* m_pal;
+  std::shared_ptr<Palette> m_pal;
   gfx::Point m_pos;
   gfx::Point m_oldMousePos;
   gfx::Point m_delta;

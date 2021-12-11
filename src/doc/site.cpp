@@ -29,7 +29,7 @@ void Site::layerIndex(LayerIndex layerIndex)
   m_layer = m_sprite->indexToLayer(layerIndex);
 }
 
-Palette* Site::palette()
+std::shared_ptr<Palette> Site::palette()
 {
   return (m_sprite ? m_sprite->palette(m_frame): NULL);
 }
@@ -66,7 +66,7 @@ Image* Site::image(int* x, int* y, int* opacity) const
   return image;
 }
 
-Palette* Site::palette() const
+std::shared_ptr<Palette> Site::palette() const
 {
   return (m_sprite ? m_sprite->palette(m_frame): NULL);
 }

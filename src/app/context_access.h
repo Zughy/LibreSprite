@@ -10,6 +10,8 @@
 #include "app/document_access.h"
 #include "doc/site.h"
 
+#include <memory>
+
 namespace app {
 
   class Context;
@@ -38,7 +40,7 @@ namespace app {
       return m_site.image(x, y, opacity);
     }
 
-    Palette* palette() const {
+    std::shared_ptr<Palette> palette() const {
       return m_site.palette();
     }
 

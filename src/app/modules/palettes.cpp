@@ -25,23 +25,19 @@
 namespace app {
 
 // The default color palette.
-static Palette* ase_default_palette = nullptr;
+static std::shared_ptr<Palette> ase_default_palette = nullptr;
 
 // Palette in current sprite frame.
-static Palette* ase_current_palette = nullptr;
+static std::shared_ptr<Palette> ase_current_palette = nullptr;
 
 int init_module_palette()
 {
-  ase_default_palette = new Palette(frame_t(0), 256);
-  ase_current_palette = new Palette(frame_t(0), 256);
+  ase_default_palette = std::make_shared<Palette>(frame_t(0), 256);
+  ase_current_palette = std::make_shared<Palette>(frame_t(0), 256);
   return 0;
 }
 
-void exit_module_palette()
-{
-  delete ase_default_palette;
-  delete ase_current_palette;
-}
+void exit_module_palette() {};
 
 void load_default_palette(const std::string& userDefined)
 {
@@ -117,46 +113,46 @@ void load_default_palette(const std::string& userDefined)
       // Save default.ase file
       if (pal) {
         palFile = defaultPalName;
-        save_palette(palFile.c_str(), pal.get(), 0);
+        save_palette(palFile.c_str(), pal, 0);
       }
     }
   }
 
   if (pal)
-    set_default_palette(pal.get());
+    set_default_palette(pal);
 
   set_current_palette(nullptr, true);
 }
 
-Palette* get_current_palette()
+std::shared_ptr<Palette> get_current_palette()
 {
   return ase_current_palette;
 }
 
-Palette* get_default_palette()
+std::shared_ptr<Palette> get_default_palette()
 {
   return ase_default_palette;
 }
 
-void set_default_palette(const Palette* palette)
+void set_default_palette(std::shared_ptr<Palette> palette)
 {
-  palette->copyColorsTo(ase_default_palette);
+  palette->copyColorsTo(ase_default_palette.get());
 }
 
 // Changes the current system palette and triggers the
 // App::PaletteChange signal.
 //
 // If "_palette" is nullptr the default palette is set.
-bool set_current_palette(const Palette *_palette, bool forced)
+bool set_current_palette(std::shared_ptr<Palette> _palette, bool forced)
 {
-  const Palette* palette = (_palette ? _palette: ase_default_palette);
+  std::shared_ptr<Palette> palette = (_palette ? _palette : ase_default_palette);
   bool ret = false;
 
   // Have changes
   if (forced ||
-      palette->countDiff(ase_current_palette, NULL, NULL) > 0) {
+      palette->countDiff(ase_current_palette.get(), NULL, NULL) > 0) {
     // Copy current palette
-    palette->copyColorsTo(ase_current_palette);
+    palette->copyColorsTo(ase_current_palette.get());
 
     // Call slots in signals
     App::instance()->PaletteChange();

@@ -52,7 +52,7 @@ void SavePaletteCommand::onLoadParams(const Params& params)
 
 void SavePaletteCommand::onExecute(Context* context)
 {
-  const doc::Palette* palette = get_current_palette();
+  const std::shared_ptr<Palette> palette = get_current_palette();
   std::string filename;
 
   if (!m_preset.empty()) {

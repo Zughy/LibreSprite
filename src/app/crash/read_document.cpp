@@ -256,7 +256,8 @@ private:
     if (npalettes >= 1 && npalettes < 0xfffff) {
       for (int i = 0; i < npalettes; ++i) {
         ObjectId palId = read32(s);
-        Palette* pal = loadObject<Palette*>("pal", palId, &Reader::readPalette);
+        Palette* raw_pal = loadObject<Palette*>("pal", palId, &Reader::readPalette);
+        std::shared_ptr<Palette> pal = std::make_shared<Palette>(raw_pal->frame(), raw_pal->size());
         if (pal)
           spr->setPalette(pal, true);
       }
@@ -323,7 +324,7 @@ private:
   }
 
   Palette* readPalette(std::ifstream& s) {
-    return read_palette(s);
+    return read_palette(s).get();
   }
 
   FrameTag* readFrameTag(std::ifstream& s) {

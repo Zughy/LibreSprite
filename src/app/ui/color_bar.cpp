@@ -541,7 +541,7 @@ void ColorBar::onRemapButtonClick()
       return;
 
     remap = create_remap_to_change_palette(
-      m_oldPalette.get(), get_current_palette(),
+      m_oldPalette.get(), get_current_palette().get(),
       sprite->transparentColor(), true);
   }
   catch (base::Exception& e) {
@@ -625,7 +625,7 @@ void ColorBar::onPaletteViewIndexChange(int index, ui::MouseButtons buttons)
   m_lock = false;
 }
 
-void ColorBar::onPaletteViewModification(const Palette* newPalette,
+void ColorBar::onPaletteViewModification(std::shared_ptr<Palette> newPalette,
                                          PaletteViewModification mod)
 {
   const char* text = "Palette Change";
@@ -637,7 +637,7 @@ void ColorBar::onPaletteViewModification(const Palette* newPalette,
   setPalette(newPalette, text);
 }
 
-void ColorBar::setPalette(const doc::Palette* newPalette, const std::string& actionText)
+void ColorBar::setPalette(std::shared_ptr<doc::Palette> newPalette, const std::string& actionText)
 {
   showRemap();
 
@@ -646,7 +646,7 @@ void ColorBar::setPalette(const doc::Palette* newPalette, const std::string& act
     Sprite* sprite = writer.sprite();
     frame_t frame = writer.frame();
     if (sprite &&
-        newPalette->countDiff(sprite->palette(frame), nullptr, nullptr)) {
+        newPalette->countDiff(sprite->palette(frame).get(), nullptr, nullptr)) {
       Transaction transaction(writer.context(), actionText, ModifyDocument);
       transaction.execute(new cmd::SetPalette(sprite, frame, newPalette));
       transaction.commit();
@@ -707,17 +707,17 @@ void ColorBar::onPaletteViewPasteColors(
     }
   }
 
-  Palette newPalette(*get_current_palette());
+  std::shared_ptr<Palette> newPalette(get_current_palette());
 
   int i = 0;
   int j = to_first;
 
   for (auto state : from) {
     if (state) {
-      if (j < newPalette.size())
-        newPalette.setEntry(j, fromPal->getEntry(i));
+      if (j < newPalette->size())
+        newPalette->setEntry(j, fromPal->getEntry(i));
       else
-        newPalette.addEntry(fromPal->getEntry(i));
+        newPalette->addEntry(fromPal->getEntry(i));
 
       for (++j; j<to.size(); ++j)
         if (to[j])
@@ -726,7 +726,7 @@ void ColorBar::onPaletteViewPasteColors(
     ++i;
   }
 
-  setPalette(&newPalette, "Paste Colors");
+  setPalette(newPalette, "Paste Colors");
 }
 
 app::Color ColorBar::onPaletteViewGetForegroundIndex()
@@ -851,8 +851,10 @@ void ColorBar::onReverseColors()
     ++i;
   }
 
-  Palette newPalette(*get_current_palette(), remap);
-  setPalette(&newPalette, "Reverse Colors");
+  Palette raw_newPalette(*get_current_palette().get(), remap);
+  std::shared_ptr<Palette> newPalette = std::make_shared<Palette>(
+    raw_newPalette.frame(), raw_newPalette.size());
+  setPalette(newPalette, "Reverse Colors");
 }
 
 void ColorBar::onSortBy(SortPaletteBy channel)
@@ -895,8 +897,10 @@ void ColorBar::onSortBy(SortPaletteBy channel)
 
   // Create a new palette and apply the remap. This is the final new
   // palette for the sprite.
-  Palette newPalette(palette, remapOrig);
-  setPalette(&newPalette, "Sort Colors");
+  Palette raw_newPalette(palette, remapOrig);
+  std::shared_ptr<Palette> newPalette = std::make_shared<Palette>(
+    raw_newPalette.frame(), raw_newPalette.size());
+  setPalette(newPalette, "Sort Colors");
 }
 
 void ColorBar::onGradient()
@@ -905,10 +909,15 @@ void ColorBar::onGradient()
   if (!m_paletteView.getSelectedRange(index1, index2))
     return;
 
-  Palette newPalette(*get_current_palette());
-  newPalette.makeGradient(index1, index2);
+  // TODO: this raw_newPalette solution is horrible, please get rid of it.
+  // INB4 why didn't you do that? -> Palettes were raw pointers, 60+ files edited
+  // in one shot, it's exhausting
+  Palette raw_newPalette(*get_current_palette());
+  raw_newPalette.makeGradient(index1, index2);
 
-  setPalette(&newPalette, "Gradient");
+  std::shared_ptr<Palette> newPalette = std::make_shared<Palette>(raw_newPalette.frame(), raw_newPalette.size());
+
+  setPalette(newPalette, "Gradient");
 }
 
 void ColorBar::setAscending(bool ascending)

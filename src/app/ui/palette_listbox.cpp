@@ -133,9 +133,9 @@ private:
   int m_state;
 };
 
-doc::Palette* PaletteListBox::selectedPalette() {
+std::shared_ptr<doc::Palette> PaletteListBox::selectedPalette() {
   if (PaletteListItem* listItem = dynamic_cast<PaletteListItem*>(getSelectedChild()))
-    return listItem->palette().get();
+    return listItem->palette();
   return nullptr;
 }
 
@@ -148,7 +148,7 @@ std::string PaletteListBox::selectedPaletteName() {
 void PaletteListBox::onChange() {
   auto palette = selectedPalette();
   if (palette)
-    PalChange(palette);
+    PalChange(palette.get());
 }
 
 void PaletteListBox::setLoading(bool isLoading) {

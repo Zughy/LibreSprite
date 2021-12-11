@@ -155,7 +155,7 @@ bool IcoFormat::onLoad(FileOp* fop)
 
   // Read the palette
   if (entry.bpp <= 8) {
-    Palette* pal = new Palette(frame_t(0), numcolors);
+    std::shared_ptr<Palette> pal = std::make_shared<Palette>(frame_t(0), numcolors);
 
     for (int i=0; i<numcolors; ++i) {
       int b = fgetc(f);
@@ -167,7 +167,6 @@ bool IcoFormat::onLoad(FileOp* fop)
     }
 
     sprite->setPalette(pal, true);
-    delete pal;
   }
 
   // Read XOR MASK
@@ -298,7 +297,7 @@ bool IcoFormat::onSave(FileOp* fop)
 
     // PALETTE
     if (bpp == 8) {
-      Palette *pal = sprite->palette(n);
+      Palette* pal = sprite->palette(n).get();
 
       fputl(0, f);  // color 0 is black, so the XOR mask works
 

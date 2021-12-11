@@ -13,6 +13,8 @@
 #include "script/script_object.h"
 #include "script/engine.h"
 
+#include <memory>
+
 class PaletteScriptObject : public script::ScriptObject {
 public:
   PaletteScriptObject() {
@@ -31,7 +33,7 @@ public:
       needIncrement = true;
       m_engine->afterEval([=](bool success){
           m_pal->incrementVersion();
-          app::set_current_palette(m_pal, true);
+          app::set_current_palette(std::shared_ptr<doc::Palette>(m_pal), true);
           ui::Manager::getDefault()->invalidate();
           needIncrement = false;
       });

@@ -56,7 +56,7 @@ Sprite::Sprite(PixelFormat format, int width, int height, int ncolors)
     case IMAGE_BITMAP: ncolors = 2; break;
   }
 
-  Palette pal(frame_t(0), ncolors);
+  std::shared_ptr<Palette> pal = std::make_shared<Palette>(frame_t(0), ncolors);
 
   switch (format) {
 
@@ -66,7 +66,7 @@ Sprite::Sprite(PixelFormat format, int width, int height, int ncolors)
       for (int c=0; c<ncolors; c++) {
         int g = 255 * c / (ncolors-1);
         g = MID(0, g, 255);
-        pal.setEntry(c, rgba(g, g, g, 255));
+        pal->setEntry(c, rgba(g, g, g, 255));
       }
       break;
   }
@@ -77,21 +77,13 @@ Sprite::Sprite(PixelFormat format, int width, int height, int ncolors)
   // The transparent color for indexed images is 0 by default
   m_transparentColor = 0;
 
-  setPalette(&pal, true);
+  setPalette(pal, true);
 }
 
 Sprite::~Sprite()
 {
   // Destroy layers
   delete m_folder;
-
-  // Destroy palettes
-  {
-    PalettesList::iterator end = m_palettes.end();
-    PalettesList::iterator it = m_palettes.begin();
-    for (; it != end; ++it)
-      delete *it;               // palette
-  }
 
   // Destroy RGB map
   delete m_rgbMap;
@@ -261,16 +253,16 @@ void Sprite::getLayersList(std::vector<Layer*>& layers) const
 //////////////////////////////////////////////////////////////////////
 // Palettes
 
-Palette* Sprite::palette(frame_t frame) const
+std::shared_ptr<Palette> Sprite::palette(frame_t frame) const
 {
   ASSERT(frame >= 0);
 
-  Palette* found = NULL;
+  std::shared_ptr<Palette> found = nullptr;
 
   PalettesList::const_iterator end = m_palettes.end();
   PalettesList::const_iterator it = m_palettes.begin();
   for (; it != end; ++it) {
-    Palette* pal = *it;
+    std::shared_ptr<Palette> pal = *it;
     if (frame < pal->frame())
       break;
 
@@ -279,7 +271,7 @@ Palette* Sprite::palette(frame_t frame) const
       break;
   }
 
-  ASSERT(found != NULL);
+  ASSERT(found != nullptr);
   return found;
 }
 
@@ -288,12 +280,12 @@ const PalettesList& Sprite::getPalettes() const
   return m_palettes;
 }
 
-void Sprite::setPalette(const Palette* pal, bool truncate)
+void Sprite::setPalette(std::shared_ptr<Palette> pal, bool truncate)
 {
-  ASSERT(pal != NULL);
+  ASSERT(pal != nullptr);
 
   if (!truncate) {
-    Palette* sprite_pal = palette(pal->frame());
+    Palette* sprite_pal = palette(pal->frame()).get();
     pal->copyColorsTo(sprite_pal);
   }
   else {
@@ -302,7 +294,7 @@ void Sprite::setPalette(const Palette* pal, bool truncate)
     PalettesList::iterator end = m_palettes.end();
     PalettesList::iterator it = m_palettes.begin();
     for (; it != end; ++it) {
-      other = *it;
+      other = (*it).get();
 
       if (pal->frame() == other->frame()) {
         pal->copyColorsTo(other);
@@ -312,7 +304,7 @@ void Sprite::setPalette(const Palette* pal, bool truncate)
         break;
     }
 
-    m_palettes.insert(it, new Palette(*pal));
+    m_palettes.insert(it, pal);
   }
 }
 
@@ -324,7 +316,6 @@ void Sprite::resetPalettes()
   if (it != end) {
     ++it;                       // Leave the first palette only.
     while (it != end) {
-      delete *it;               // palette
       it = m_palettes.erase(it);
       end = m_palettes.end();
     }
@@ -335,10 +326,9 @@ void Sprite::deletePalette(frame_t frame)
 {
   auto it = m_palettes.begin(), end = m_palettes.end();
   for (; it != end; ++it) {
-    Palette* pal = *it;
+    Palette* pal = (*it).get();
 
     if (pal->frame() == frame) {
-      delete pal;                   // delete palette
       m_palettes.erase(it);
       break;
     }
@@ -356,13 +346,13 @@ RgbMap* Sprite::rgbMap(frame_t frame, RgbMapFor forLayer) const
   int maskIndex = (forLayer == RgbMapFor::OpaqueLayer ?
                    -1: transparentColor());
 
-  if (m_rgbMap == NULL) {
+  if (m_rgbMap == nullptr) {
     m_rgbMap = new RgbMap();
-    m_rgbMap->regenerate(palette(frame), maskIndex);
+    m_rgbMap->regenerate(palette(frame).get(), maskIndex);
   }
-  else if (!m_rgbMap->match(palette(frame)) ||
+  else if (!m_rgbMap->match(palette(frame).get()) ||
            m_rgbMap->maskIndex() != maskIndex) {
-    m_rgbMap->regenerate(palette(frame), maskIndex);
+    m_rgbMap->regenerate(palette(frame).get(), maskIndex);
   }
 
   return m_rgbMap;

@@ -88,7 +88,7 @@ void AddColorCommand::onExecute(Context* ctx)
   }
 
   try {
-    Palette* newPalette = get_current_palette(); // System current pal
+    std::shared_ptr<Palette> newPalette = get_current_palette(); // System current pal
     color_t color = doc::rgba(
       appColor.getRed(),
       appColor.getGreen(),

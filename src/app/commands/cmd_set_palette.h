@@ -9,6 +9,8 @@
 
 #include "app/commands/command.h"
 
+#include <memory>
+
 namespace doc {
   class Palette;
 }
@@ -22,13 +24,13 @@ namespace app {
     SetPaletteCommand();
     Command* clone() const override { return new SetPaletteCommand(*this); }
 
-    void setPalette(const doc::Palette* palette) { m_palette = palette; }
+    void setPalette(std::shared_ptr<doc::Palette> palette) { m_palette = palette; }
 
   protected:
     virtual void onExecute(Context* context) override;
 
   private:
-    const doc::Palette* m_palette;
+    std::shared_ptr<doc::Palette> m_palette;
   };
 
 } // namespace app

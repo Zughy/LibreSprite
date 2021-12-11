@@ -23,11 +23,13 @@ in the Filesystem.
 #include "ui/listbox.h"
 #include "ui/timer.h"
 
+#include <memory>
+
 namespace app {
   class PaletteListBox : public ui::ListBox {
   public:
     PaletteListBox() = default;
-    doc::Palette* selectedPalette();
+    std::shared_ptr<doc::Palette> selectedPalette();
     std::string selectedPaletteName();
     base::Signal1<void, doc::Palette*> PalChange;
     void addPalette(std::shared_ptr<doc::Palette> palette, const std::string& name);

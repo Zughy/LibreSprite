@@ -175,7 +175,7 @@ int PaletteView::getSelectedEntriesCount() const
 app::Color PaletteView::getColorByPosition(const gfx::Point& pos)
 {
   gfx::Point relPos = pos - bounds().origin();
-  Palette* palette = currentPalette();
+  Palette* palette = currentPalette().get();
   for (int i=0; i<palette->size(); ++i) {
     if (getPaletteEntryBounds(i).contains(relPos))
       return app::Color::fromIndex(i);
@@ -227,7 +227,7 @@ void PaletteView::cutToClipboard()
   if (!m_selectedEntries.picks())
     return;
 
-  clipboard::copy_palette(currentPalette(), m_selectedEntries);
+  clipboard::copy_palette(currentPalette().get(), m_selectedEntries);
 
   clearSelection();
 }
@@ -237,7 +237,7 @@ void PaletteView::copyToClipboard()
   if (!m_selectedEntries.picks())
     return;
 
-  clipboard::copy_palette(currentPalette(), m_selectedEntries);
+  clipboard::copy_palette(currentPalette().get(), m_selectedEntries);
 
   startMarchingAnts();
   invalidate();
@@ -363,7 +363,7 @@ bool PaletteView::onProcessMessage(Message* msg)
               int newPalSize = MAX(1, m_hot.color);
               Palette newPalette(*currentPalette());
               newPalette.resize(newPalSize);
-              setNewPalette(currentPalette(), &newPalette,
+              setNewPalette(currentPalette().get(), &newPalette,
                             PaletteViewModification::RESIZE);
             }
             break;
@@ -421,7 +421,7 @@ void PaletteView::onPaint(ui::PaintEvent& ev)
   int outlineWidth = theme->dimensions.paletteOutlineWidth();
   ui::Graphics* g = ev.graphics();
   gfx::Rect bounds = clientBounds();
-  Palette* palette = currentPalette();
+  Palette* palette = currentPalette().get();
   int fgIndex = -1;
   int bgIndex = -1;
   int transparentIndex = -1;
@@ -670,7 +670,7 @@ PaletteView::Hit PaletteView::hitTest(const gfx::Point& pos)
 {
   SkinTheme* theme = static_cast<SkinTheme*>(this->theme());
   int outlineWidth = theme->dimensions.paletteOutlineWidth();
-  Palette* palette = currentPalette();
+  Palette* palette = currentPalette().get();
 
   if (m_state == State::WAITING && m_editable) {
     // First check if the mouse is inside the selection outline.
@@ -923,7 +923,7 @@ void PaletteView::setStatusBar()
   }
 }
 
-doc::Palette* PaletteView::currentPalette() const
+std::shared_ptr<doc::Palette> PaletteView::currentPalette() const
 {
   return get_current_palette();
 }
@@ -957,12 +957,15 @@ void PaletteView::setNewPalette(doc::Palette* oldPalette,
   if (!newPalette->countDiff(oldPalette, nullptr, nullptr))
     return;
 
+  std::shared_ptr<doc::Palette> newPal = std::make_shared<Palette>(
+    newPalette->frame(), newPalette->size());
+
   if (m_delegate) {
-    m_delegate->onPaletteViewModification(newPalette, mod);
+    m_delegate->onPaletteViewModification(newPal, mod);
     m_delegate->onPaletteViewIndexChange(m_currentEntry, ui::kButtonLeft);
   }
 
-  set_current_palette(newPalette, false);
+  set_current_palette(newPal, false);
   manager()->invalidate();
 }
 

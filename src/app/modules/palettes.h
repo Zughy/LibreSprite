@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 namespace doc {
@@ -25,11 +26,11 @@ namespace app {
   // line.
   void load_default_palette(const std::string& userDefined);
 
-  Palette* get_default_palette();
-  Palette* get_current_palette();
+  std::shared_ptr<Palette> get_default_palette();
+  std::shared_ptr<Palette> get_current_palette();
 
-  void set_default_palette(const Palette* palette);
-  bool set_current_palette(const Palette* palette, bool forced);
+  void set_default_palette(std::shared_ptr<Palette> palette);
+  bool set_current_palette(std::shared_ptr<Palette> palette, bool forced);
 
   std::string get_preset_palette_filename(const std::string& preset,
                                           const std::string& dot_extension);

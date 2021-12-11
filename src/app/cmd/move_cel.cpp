@@ -103,7 +103,7 @@ void MoveCel::onExecute()
       std::shared_ptr<Image> tmp(Image::createCopy(dstImage.get()));
       render::composite_image(
         tmp.get(), srcImage,
-        srcSprite->palette(m_srcFrame),
+        srcSprite->palette(m_srcFrame).get(),
         srcCel->x(), srcCel->y(), 255, blend);
       executeAndAdd(new cmd::CopyRect(dstImage.get(), tmp.get(), gfx::Clip(tmp->bounds())));
     }

@@ -28,7 +28,7 @@ SetPaletteCommand::SetPaletteCommand()
   : Command("SetPalette",
             "Set Palette",
             CmdRecordableFlag)
-  , m_palette(NULL)
+  , m_palette(nullptr)
 {
 }
 

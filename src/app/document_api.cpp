@@ -522,14 +522,14 @@ void DocumentApi::setMaskPosition(int x, int y)
   m_transaction.execute(new cmd::SetMaskPosition(m_document, gfx::Point(x, y)));
 }
 
-void DocumentApi::setPalette(Sprite* sprite, frame_t frame, const Palette* newPalette)
+void DocumentApi::setPalette(Sprite* sprite, frame_t frame, std::shared_ptr<Palette> newPalette)
 {
-  Palette* currentSpritePalette = sprite->palette(frame); // Sprite current pal
+  Palette* currentSpritePalette = sprite->palette(frame).get(); // Sprite current pal
   int from, to;
 
   // Check differences between current sprite palette and current system palette
   from = to = -1;
-  currentSpritePalette->countDiff(newPalette, &from, &to);
+  currentSpritePalette->countDiff(newPalette.get(), &from, &to);
 
   if (from >= 0 && to >= from) {
     m_transaction.execute(new cmd::SetPalette(

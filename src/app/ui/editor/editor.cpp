@@ -529,7 +529,7 @@ void Editor::drawOneSpriteUnclippedRect(ui::Graphics* g, const gfx::Rect& sprite
     }
 
     if (tmp->nativeHandle()) {
-      convert_image_to_surface(rendered.get(), m_sprite->palette(m_frame),
+      convert_image_to_surface(rendered.get(), m_sprite->palette(m_frame).get(),
         tmp, 0, 0, 0, 0, rc.w, rc.h);
 
       g->blit(tmp, 0, 0, dest_x, dest_y, rc.w, rc.h);

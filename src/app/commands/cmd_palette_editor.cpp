@@ -486,7 +486,7 @@ void PaletteEntryEditor::setPaletteEntry(const app::Color& color)
                                     color.getGreen(),
                                     color.getBlue(), 255);
 
-  Palette* palette = get_current_palette();
+  Palette* palette = get_current_palette().get();
   for (int c=0; c<palette->size(); c++) {
     if (entries[c])
       palette->setEntry(c, new_pal_color);
@@ -502,7 +502,7 @@ void PaletteEntryEditor::setAbsolutePaletteEntryChannel(ColorSliders::Channel ch
   uint32_t src_color;
   int r, g, b, a;
 
-  Palette* palette = get_current_palette();
+  Palette* palette = get_current_palette().get();
   for (int c=0; c<palette->size(); c++) {
     if (!entries[c])
       continue;
@@ -600,7 +600,7 @@ void PaletteEntryEditor::setRelativePaletteEntryChannel(ColorSliders::Channel ch
   uint32_t src_color;
   int r, g, b, a;
 
-  Palette* palette = get_current_palette();
+  Palette* palette = get_current_palette().get();
   for (int c=0; c<palette->size(); c++) {
     if (!entries[c])
       continue;
@@ -676,14 +676,14 @@ void PaletteEntryEditor::updateCurrentSpritePalette(const char* operationName)
       ContextWriter writer(UIContext::instance());
       Document* document(writer.document());
       Sprite* sprite(writer.sprite());
-      Palette* newPalette = get_current_palette(); // System current pal
+      std::shared_ptr<Palette> newPalette = get_current_palette(); // System current pal
       frame_t frame = writer.frame();
-      Palette* currentSpritePalette = sprite->palette(frame); // Sprite current pal
+      Palette* currentSpritePalette = sprite->palette(frame).get(); // Sprite current pal
       int from, to;
 
       // Check differences between current sprite palette and current system palette
       from = to = -1;
-      currentSpritePalette->countDiff(newPalette, &from, &to);
+      currentSpritePalette->countDiff(newPalette.get(), &from, &to);
 
       if (from >= 0 && to >= from) {
         DocumentUndo* undo = document->undoHistory();

@@ -9,6 +9,8 @@
 #include "doc/frame.h"
 #include "doc/layer_index.h"
 
+#include <memory>
+
 namespace doc {
 
   class Cel;
@@ -47,9 +49,9 @@ namespace doc {
 
     LayerIndex layerIndex() const;
     void layerIndex(LayerIndex layerIndex);
-    Palette* palette();
+    std::shared_ptr<Palette> palette();
     Image* image(int* x = nullptr, int* y = nullptr, int* opacity = nullptr) const;
-    Palette* palette() const;
+    std::shared_ptr<Palette> palette() const;
 
   private:
     Document* m_document;

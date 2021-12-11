@@ -295,7 +295,7 @@ bool FilterManagerImpl::skipPixel()
 
 Palette* FilterManagerImpl::getPalette()
 {
-  return m_site.sprite()->palette(m_site.frame());
+  return m_site.sprite()->palette(m_site.frame()).get();
 }
 
 RgbMap* FilterManagerImpl::getRgbMap()

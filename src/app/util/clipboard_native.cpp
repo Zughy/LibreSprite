@@ -67,7 +67,7 @@ bool has_native_clipboard_bitmap()
 
 bool set_native_clipboard_bitmap(const doc::Image* image,
                                  const doc::Mask* mask,
-                                 const doc::Palette* palette)
+                                 std::shared_ptr<doc::Palette> palette)
 {
   clip::lock l(native_display_handle());
   if (!l.locked())
@@ -189,7 +189,7 @@ bool get_native_clipboard_bitmap(doc::Image** image,
         int bits = read32(is);
         if (bits & 1) *image   = doc::read_image(is, false);
         if (bits & 2) *mask    = doc::read_mask(is);
-        if (bits & 4) *palette = doc::read_palette(is);
+        if (bits & 4) *palette = doc::read_palette(is).get();
         if (image)
           return true;
       }

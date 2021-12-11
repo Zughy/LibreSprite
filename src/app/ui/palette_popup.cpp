@@ -67,7 +67,7 @@ void PalettePopup::onPalChange(doc::Palette* palette)
 
 void PalettePopup::onLoadPal()
 {
-  doc::Palette* palette = m_paletteListBox.selectedPalette();
+  std::shared_ptr<doc::Palette> palette = m_paletteListBox.selectedPalette();
   if (!palette)
     return;
 

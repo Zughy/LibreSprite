@@ -148,7 +148,11 @@ static void set_clipboard_image(Image* image,
         image->setMaskColor(-1);
     }
 
-    set_native_clipboard_bitmap(image, mask, palette);
+    // TODO: clean up this smart palette thing
+    std::shared_ptr<Palette> smart_palette = std::make_shared<Palette>(
+      palette->frame(), palette->size());
+
+    set_native_clipboard_bitmap(image, mask, smart_palette);
 
     if (image && !image_source_is_transparent)
       image->setMaskColor(oldMask);
@@ -167,7 +171,7 @@ static bool copy_from_document(const Site& site, bool merged = false)
   if (!image)
     return false;
 
-  const Palette* pal = document->sprite()->palette(site.frame());
+  const Palette* pal = document->sprite()->palette(site.frame()).get();
   set_clipboard_image(
     image,
     (mask ? new Mask(*mask): nullptr),
@@ -316,7 +320,7 @@ void paste()
       if (!clipboard_image)
         return;
 
-      Palette* dst_palette = dstSpr->palette(editor->frame());
+      Palette* dst_palette = dstSpr->palette(editor->frame()).get();
 
       // Source image (clipboard or a converted copy to the destination 'imgtype')
       std::shared_ptr<Image> src_image;

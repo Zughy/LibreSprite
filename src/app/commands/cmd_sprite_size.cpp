@@ -101,7 +101,7 @@ protected:
         doc::algorithm::resize_image(
           image, new_image.get(),
           m_resize_method,
-          m_sprite->palette(cel->frame()),
+          m_sprite->palette(cel->frame()).get(),
           m_sprite->rgbMap(cel->frame()),
           (cel->layer()->isBackground() ? -1: m_sprite->transparentColor()));
 
@@ -133,9 +133,9 @@ protected:
       algorithm::resize_image(
         old_bitmap.get(), new_mask->bitmap(),
         m_resize_method,
-        m_sprite->palette(0), // Ignored
-        m_sprite->rgbMap(0),  // Ignored
-        -1);                  // Ignored
+        m_sprite->palette(0).get(), // Ignored
+        m_sprite->rgbMap(0),        // Ignored
+        -1);                        // Ignored
 
       // Reshrink
       new_mask->intersect(new_mask->bounds());

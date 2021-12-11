@@ -32,7 +32,7 @@ public:
     if (m_document) {
       m_sprite = doc()->sprite();
       if (m_pal)
-        m_pal->setWrapped(m_sprite->palette(app::frame_t(0)));
+        m_pal->setWrapped(m_sprite->palette(app::frame_t(0)).get());
     }
 
     addProperty("layerCount", [this]{return (int) m_sprite->countLayers();})
@@ -188,7 +188,7 @@ public:
     std::shared_ptr<doc::Palette> palette(app::load_palette(fileName.c_str()));
     if (palette) {
       // TODO Merge this with the code in LoadPaletteCommand
-      doc()->getApi(transaction()).setPalette(m_sprite, 0, palette.get());
+      doc()->getApi(transaction()).setPalette(m_sprite, 0, palette);
     }
   }
 };

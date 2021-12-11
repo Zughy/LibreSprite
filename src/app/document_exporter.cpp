@@ -648,7 +648,7 @@ void DocumentExporter::captureSamples(Samples& samples)
 
 Document* DocumentExporter::createEmptyTexture(const Samples& samples)
 {
-  Palette* palette = NULL;
+  std::shared_ptr<Palette> palette = nullptr;
   PixelFormat pixelFormat = IMAGE_INDEXED;
   gfx::Rect fullTextureBounds(0, 0, m_textureWidth, m_textureHeight);
   int maxColors = 256;
@@ -666,8 +666,8 @@ Document* DocumentExporter::createEmptyTexture(const Samples& samples)
       else if (it->sprite()->getPalettes().size() > 1) {
         pixelFormat = IMAGE_RGB;
       }
-      else if (palette != NULL
-        && palette->countDiff(it->sprite()->palette(frame_t(0)), NULL, NULL) > 0) {
+      else if (palette != nullptr
+        && palette->countDiff(it->sprite()->palette(frame_t(0)).get(), NULL, NULL) > 0) {
         pixelFormat = IMAGE_RGB;
       }
       else
@@ -698,7 +698,7 @@ Document* DocumentExporter::createEmptyTexture(const Samples& samples)
       fullTextureBounds.x+fullTextureBounds.w,
       fullTextureBounds.y+fullTextureBounds.h, maxColors));
 
-  if (palette != NULL)
+  if (palette != nullptr)
     sprite->setPalette(palette, false);
 
   return new Document(sprite.release());

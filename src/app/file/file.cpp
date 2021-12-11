@@ -316,7 +316,7 @@ FileOp* FileOp::createSaveDocumentOperation(const Context* context,
 
   // Big palettes
   if (!fop->m_format->support(FILE_SUPPORT_BIG_PALETTES)) {
-    for (const Palette* pal : fop->m_document->sprite()->getPalettes()) {
+    for (auto& pal : fop->m_document->sprite()->getPalettes()) {
       if (pal->size() > 256) {
         warnings += "<<- Palettes with more than 256 colors";
         break;
@@ -327,7 +327,7 @@ FileOp* FileOp::createSaveDocumentOperation(const Context* context,
   // Palette with alpha
   if (!fop->m_format->support(FILE_SUPPORT_PALETTE_WITH_ALPHA)) {
     bool done = false;
-    for (const Palette* pal : fop->m_document->sprite()->getPalettes()) {
+    for (auto& pal : fop->m_document->sprite()->getPalettes()) {
       for (int c=0; c<pal->size(); ++c) {
         if (rgba_geta(pal->getEntry(c)) < 255) {
           warnings += "<<- Palette with alpha channel";
@@ -510,7 +510,7 @@ void FileOp::operate(IFileOpProgress* progress)
         m_seq.layer->addCel(m_seq.last_cel);
 
         if (m_document->sprite()->palette(frame)
-            ->countDiff(m_seq.palette, NULL, NULL) > 0) {
+            ->countDiff(m_seq.palette.get(), NULL, NULL) > 0) {
           m_seq.palette->setFrame(frame);
           m_document->sprite()->setPalette(m_seq.palette, true);
         }
@@ -634,7 +634,7 @@ void FileOp::operate(IFileOpProgress* progress)
         render.renderSprite(m_seq.image.get(), sprite, frame);
 
         // Setup the palette.
-        sprite->palette(frame)->copyColorsTo(m_seq.palette);
+        sprite->palette(frame)->copyColorsTo(m_seq.palette.get());
 
         // Setup the filename to be used.
         m_filename = m_seq.filename_list[frame];
@@ -687,8 +687,6 @@ FileOp::~FileOp()
 {
   if (m_format)
     m_format->destroyData(this);
-
-  delete m_seq.palette;
 }
 
 void FileOp::createDocument(Sprite* spr)
@@ -732,7 +730,7 @@ void FileOp::postLoad()
           nullptr, nullptr)};
 
       sprite->resetPalettes();
-      sprite->setPalette(palette.get(), false);
+      sprite->setPalette(palette, false);
     }
   }
 
@@ -926,7 +924,7 @@ FileOp::FileOp(FileOpType type, Context* context)
 
 void FileOp::prepareForSequence()
 {
-  m_seq.palette = new Palette(frame_t(0), 256);
+  m_seq.palette = std::make_shared<Palette>(frame_t(0), 256);
   m_seq.format_options.reset();
 }
 

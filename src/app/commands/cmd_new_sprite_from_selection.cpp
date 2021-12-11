@@ -62,7 +62,7 @@ void NewSpriteFromSelectionCommand::onExecute(Context* context)
   if (!image)
     return;
 
-  Palette* palette = sprite->palette(site.frame());
+  Palette* palette = sprite->palette(site.frame()).get();
 
   std::unique_ptr<Sprite> dstSprite(
     Sprite::createBasicSprite(image->pixelFormat(),
@@ -70,7 +70,7 @@ void NewSpriteFromSelectionCommand::onExecute(Context* context)
                               image->height(),
                               palette->size()));
 
-  palette->copyColorsTo(dstSprite->palette(frame_t(0)));
+  palette->copyColorsTo(dstSprite->palette(frame_t(0)).get());
 
   LayerImage* dstLayer = static_cast<LayerImage*>(dstSprite->folder()->getFirstLayer());
   if (site.layer()->isBackground())

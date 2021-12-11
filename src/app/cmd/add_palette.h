@@ -11,6 +11,7 @@
 #include "app/cmd/with_sprite.h"
 #include "doc/frame.h"
 
+#include <memory>
 #include <sstream>
 
 namespace doc {
@@ -25,7 +26,7 @@ namespace cmd {
   class AddPalette : public Cmd
                    , public WithSprite {
   public:
-    AddPalette(Sprite* sprite, Palette* pal);
+    AddPalette(Sprite* sprite, std::shared_ptr<Palette> pal);
 
   protected:
     void onExecute() override;

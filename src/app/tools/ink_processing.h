@@ -17,6 +17,8 @@
 #include "gfx/hsv.h"
 #include "gfx/rgb.h"
 
+#include <memory>
+
 namespace app {
 namespace tools {
 
@@ -195,7 +197,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   const color_t m_color;
   const int m_opacity;
@@ -259,7 +261,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   const int m_opacity;
   const color_t m_color;
@@ -325,7 +327,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   const int m_opacity;
   const int m_maskIndex;
@@ -457,7 +459,7 @@ public:
     m_opacity(loop->getOpacity()),
     m_tiledMode(loop->getTiledMode()),
     m_srcImage(loop->getSrcImage()),
-    m_area(get_current_palette(),
+    m_area(get_current_palette().get(),
            loop->getLayer()->isBackground() ? -1: loop->sprite()->transparentColor()) {
   }
 
@@ -512,7 +514,7 @@ private:
     }
   };
 
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   int m_opacity;
   TiledMode m_tiledMode;
@@ -596,7 +598,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   color_t m_color1;
   color_t m_color2;
@@ -652,7 +654,7 @@ private:
     m_color = get_pixel(m_srcImage, u, v);
   }
 
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   Point m_speed;
   int m_opacity;
@@ -759,7 +761,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   const Remap* m_remap;
   bool m_left;
@@ -815,7 +817,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   const Remap* m_remap;
   bool m_left;
@@ -854,7 +856,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const Remap* m_remap;
   bool m_left;
 };
@@ -905,7 +907,7 @@ public:
   }
 
 private:
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const RgbMap* m_rgbmap;
   color_t m_color;
 };
@@ -944,7 +946,7 @@ private:
 
   color_t m_fgColor;
   color_t m_bgColor;
-  const Palette* m_palette;
+  std::shared_ptr<Palette> m_palette;
   const Brush* m_brush;
   const Image* m_brushImage;
   int m_opacity;

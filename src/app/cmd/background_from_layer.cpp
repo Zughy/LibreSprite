@@ -61,7 +61,7 @@ void BackgroundFromLayer::onExecute()
     clear_image(bg_image.get(), bgcolor);
     render::composite_image(
       bg_image.get(), cel_image,
-      sprite->palette(cel->frame()),
+      sprite->palette(cel->frame()).get(),
       cel->x(), cel->y(),
       MID(0, cel->opacity(), 255),
       static_cast<LayerImage*>(layer)->blendMode());

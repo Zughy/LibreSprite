@@ -663,7 +663,7 @@ void Render::renderSprite(
     renderImage(
       dstImage,
       m_previewImage,
-      m_sprite->palette(frame),
+      m_sprite->palette(frame).get(),
       m_previewPos.x,
       m_previewPos.y,
       area,
@@ -847,7 +847,7 @@ void Render::renderLayer(
 
       const Cel* cel = layer->cel(frame);
       if (cel) {
-        Palette* pal = m_sprite->palette(frame);
+        Palette* pal = m_sprite->palette(frame).get();
         const Image* celImage;
         gfx::Point celPos;
 
@@ -933,7 +933,7 @@ void Render::renderLayer(
     if (m_extraCel->opacity() > 0) {
       renderCel(
         image, m_extraImage,
-        m_sprite->palette(frame),
+        m_sprite->palette(frame).get(),
         m_extraCel->position(),
         gfx::Clip(area.dst.x+extraArea.x-area.src.x,
                   area.dst.y+extraArea.y-area.src.y,

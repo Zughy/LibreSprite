@@ -82,10 +82,10 @@ void MergeDownLayerCommand::onExecute(Context* context)
 
     // Get images
     Image* src_image;
-    if (src_cel != NULL)
+    if (src_cel != nullptr)
       src_image = src_cel->image();
     else
-      src_image = NULL;
+      src_image = nullptr;
 
     std::shared_ptr<Image> dst_image;
     if (dst_cel)
@@ -135,7 +135,7 @@ void MergeDownLayerCommand::onExecute(Context* context)
         // Merge src_image in new_image
         render::composite_image(
           new_image.get(), src_image,
-          sprite->palette(src_cel->frame()),
+          sprite->palette(src_cel->frame()).get(),
           src_cel->x()-bounds.x,
           src_cel->y()-bounds.y,
           opacity,

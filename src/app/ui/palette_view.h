@@ -16,6 +16,7 @@
 #include "ui/mouse_buttons.h"
 #include "ui/widget.h"
 
+#include <memory>
 #include <vector>
 
 namespace doc {
@@ -34,7 +35,7 @@ namespace app {
   public:
     virtual ~PaletteViewDelegate() { }
     virtual void onPaletteViewIndexChange(int index, ui::MouseButtons buttons) { }
-    virtual void onPaletteViewModification(const doc::Palette* newPalette, PaletteViewModification mod) { }
+    virtual void onPaletteViewModification(std::shared_ptr<doc::Palette> newPalette, PaletteViewModification mod) { }
     virtual void onPaletteViewChangeSize(int boxsize) { }
     virtual void onPaletteViewPasteColors(
       const doc::Palette* fromPal, const doc::PalettePicks& from, const doc::PalettePicks& to) { }
@@ -134,7 +135,7 @@ namespace app {
     void updateCopyFlag(ui::Message* msg);
     void setCursor();
     void setStatusBar();
-    doc::Palette* currentPalette() const;
+    std::shared_ptr<doc::Palette> currentPalette() const;
     int findExactIndex(const app::Color& color) const;
     void setNewPalette(doc::Palette* oldPalette, doc::Palette* newPalette,
                        PaletteViewModification mod);

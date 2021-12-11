@@ -9,6 +9,8 @@
 
 #include "gfx/fwd.h"
 
+#include <memory>
+
 namespace doc {
   class Image;
   class Mask;
@@ -22,7 +24,7 @@ void register_native_clipboard_formats();
 bool has_native_clipboard_bitmap();
 bool set_native_clipboard_bitmap(const doc::Image* image,
                                  const doc::Mask* mask,
-                                 const doc::Palette* palette);
+                                std::shared_ptr<doc::Palette> palette);
 bool get_native_clipboard_bitmap(doc::Image** image,
                                  doc::Mask** mask,
                                  doc::Palette** palette);

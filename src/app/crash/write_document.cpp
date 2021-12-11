@@ -35,6 +35,7 @@
 
 #include <fstream>
 #include <map>
+#include <memory>
 
 namespace app {
 namespace crash {
@@ -61,7 +62,7 @@ public:
     // Save from objects without children (e.g. images), to aggregated
     // objects (e.g. cels, layers, etc.)
 
-    for (Palette* pal : spr->getPalettes())
+    for (auto& pal : spr->getPalettes())
       saveObject("pal", pal, &Writer::writePalette);
 
     for (FrameTag* frtag : spr->frameTags())
@@ -111,7 +112,7 @@ private:
 
     // IDs of all palettes
     write32(s, spr->getPalettes().size());
-    for (Palette* pal : spr->getPalettes())
+    for (auto& pal : spr->getPalettes())
       write32(s, pal->id());
 
     // IDs of all frame tags
@@ -150,7 +151,7 @@ private:
     write_image(s, img);
   }
 
-  void writePalette(std::ofstream& s, Palette* pal) {
+  void writePalette(std::ofstream& s, std::shared_ptr<Palette> pal) {
     write_palette(s, pal);
   }
 
@@ -160,6 +161,50 @@ private:
 
   template<typename T>
   void saveObject(const char* prefix, T* obj, void (Writer::*writeMember)(std::ofstream&, T*)) {
+    if (!obj->version())
+      obj->incrementVersion();
+
+    ObjVersions& versions = m_objVersions[obj->id()];
+    if (versions.newer() == obj->version())
+      return;
+
+    std::string fn = prefix;
+    fn.push_back('-');
+    fn += base::convert_to<std::string>(obj->id());
+
+    std::string fullfn = base::join_path(m_dir, fn);
+    std::string oldfn = fullfn + "." + base::convert_to<std::string>(versions.older());
+    fullfn += "." + base::convert_to<std::string>(obj->version());
+
+    std::ofstream s(FSTREAM_PATH(fullfn), std::ofstream::binary);
+    write32(s, 0);                // Leave a room for the magic number
+    (this->*writeMember)(s, obj); // Write the object
+
+    // Flush all data. In this way we ensure that the magic number is
+    // the last thing being written in the file.
+    s.flush();
+
+    // Write the magic number
+    s.seekp(0);
+    write32(s, MAGIC_NUMBER);
+
+    // Remove the older version
+    try {
+      if (versions.older() && base::is_file(oldfn))
+        base::delete_file(oldfn);
+    }
+    catch (const std::exception&) {
+      TRACE(" - Cannot delete %s #%d v%d\n", prefix, obj->id(), versions.older());
+    }
+
+    // Rotate versions and add the latest one
+    versions.rotateRevisions(obj->version());
+
+    TRACE(" - Saved %s #%d v%d\n", prefix, obj->id(), obj->version());
+  }
+
+  template<typename T>
+  void saveObject(const char* prefix, std::shared_ptr<T> obj, void (Writer::*writeMember)(std::ofstream&, std::shared_ptr<T>)) {
     if (!obj->version())
       obj->incrementVersion();
 

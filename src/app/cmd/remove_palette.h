@@ -9,13 +9,15 @@
 
 #include "app/cmd/add_palette.h"
 
+#include <memory>
+
 namespace app {
 namespace cmd {
   using namespace doc;
 
   class RemovePalette : public AddPalette {
   public:
-    RemovePalette(Sprite* sprite, Palette* pal);
+    RemovePalette(Sprite* sprite, std::shared_ptr<Palette> pal);
 
   protected:
     void onExecute() override;

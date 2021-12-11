@@ -20,7 +20,7 @@ namespace cmd {
 
 using namespace doc;
 
-AddPalette::AddPalette(Sprite* sprite, Palette* pal)
+AddPalette::AddPalette(Sprite* sprite, std::shared_ptr<Palette> pal)
   : WithSprite(sprite)
   , m_size(0)
   , m_frame(pal->frame())
@@ -34,7 +34,7 @@ void AddPalette::onExecute()
   m_stream.seekp(0);
 
   Sprite* sprite = this->sprite();
-  Palette* pal = read_palette(m_stream);
+  std::shared_ptr<Palette> pal = read_palette(m_stream);
 
   sprite->setPalette(pal, true);
   sprite->incrementVersion();

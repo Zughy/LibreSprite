@@ -234,22 +234,22 @@ bool AseFormat::onLoad(FileOp* fop)
           case ASE_FILE_CHUNK_FLI_COLOR:
           case ASE_FILE_CHUNK_FLI_COLOR2:
             if (!ignore_old_color_chunks) {
-              Palette* prevPal = sprite->palette(frame);
-              std::unique_ptr<Palette> pal(chunk_type == ASE_FILE_CHUNK_FLI_COLOR ?
+              Palette* prevPal = sprite->palette(frame).get();
+              std::shared_ptr<Palette> pal(chunk_type == ASE_FILE_CHUNK_FLI_COLOR ?
                                      ase_file_read_color_chunk(f, prevPal, frame):
                                      ase_file_read_color2_chunk(f, prevPal, frame));
 
               if (prevPal->countDiff(pal.get(), NULL, NULL) > 0)
-                sprite->setPalette(pal.get(), true);
+                sprite->setPalette(pal, true);
             }
             break;
 
           case ASE_FILE_CHUNK_PALETTE: {
-            Palette* prevPal = sprite->palette(frame);
-            std::unique_ptr<Palette> pal(ase_file_read_palette_chunk(f, prevPal, frame));
+            Palette* prevPal = sprite->palette(frame).get();
+            std::shared_ptr<Palette> pal(ase_file_read_palette_chunk(f, prevPal, frame));
 
             if (prevPal->countDiff(pal.get(), NULL, NULL) > 0)
-              sprite->setPalette(pal.get(), true);
+              sprite->setPalette(pal, true);
 
             ignore_old_color_chunks = true;
             break;
@@ -372,7 +372,7 @@ bool AseFormat::onSave(FileOp* fop)
   ase_file_write_header(f, &header);
 
   bool require_new_palette_chunk = false;
-  for (Palette* pal : sprite->getPalettes()) {
+  for (auto& pal : sprite->getPalettes()) {
     if (pal->size() != 256 || pal->hasAlpha()) {
       require_new_palette_chunk = true;
       break;
@@ -389,7 +389,7 @@ bool AseFormat::onSave(FileOp* fop)
     frame_header.duration = sprite->frameDuration(frame);
 
     // is the first frame or did the palette change?
-    Palette* pal = sprite->palette(frame);
+    Palette* pal = sprite->palette(frame).get();
     int palFrom = 0, palTo = pal->size()-1;
     if ((frame == 0 ||
          sprite->palette(frame-1)->countDiff(pal, &palFrom, &palTo) > 0)) {
